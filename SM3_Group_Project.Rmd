@@ -1,0 +1,74 @@
+---
+title: "Statistical Modelling III - Group Assignment"
+author: 
+output:
+  pdf_document: default
+  html_document: default
+  fig_caption: yes
+---
+
+# 1. Introduction
+
+# 2. Data Description
+
+# 3. Cleaning
+
+### 3.1. Loading and Type Assignment
+
+
+### 3.2. Missing Values
+
+
+
+
+# 4. Description of Variables
+
+### 4.1. Continuous Variables
+
+
+### 4.2. Catagorical Variables
+
+
+# 5. Bivariate Analysis
+
+
+
+### 5.1. Continuous Variables
+
+
+
+
+### 5.2. Categorical Variables
+
+
+
+
+### 5.3. Bivariate Analysis Between Predictors
+
+
+
+# 6. Model Fitting
+
+
+
+# 7. Final Model
+
+
+
+# 8. Assumption Checking
+
+
+
+# 9. Prediction
+
+
+
+
+
+# 10. Conclusion
+
+
+
+# Reference
+
+

@@ -76,8 +76,9 @@ colnames(dat) <- headers
 
 trainY = dat[ ,ncol(dat)]
 
-# Generate a logistic regression model
-logit_model <- glm(trainY ~ Sex, data = full_set, family = binomial(logit))
+# Generate a logistic regression model using all predictors
+logit_model <- glm(trainY~., data = dat, family = binomial(logit))
+summary(logit_model)
 
 
 
