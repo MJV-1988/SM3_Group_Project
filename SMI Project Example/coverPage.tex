@@ -1,0 +1,62 @@
+ \documentclass[12t]{article}
+ 
+ \usepackage[margin=1in]{geometry} 
+ \usepackage{amsmath,amsthm,amssymb, mathtools}
+ \usepackage{graphicx}
+ \usepackage{subcaption}
+
+ 
+ \newcommand {\Q} {\mathbb{Q}}
+ \newcommand {\Pb} {\mathbb{P}}
+ \newcommand {\Z} {\mathbb{Z}}
+ \newcommand {\R} {\mathbb{R}}
+
+  
+ \begin{document}
+ 	% PUT YOUR TITLE AND NAME HERE
+ 	\newcommand{\titlestr}{Predicting Song Populatity}
+ 	\newcommand{\shorttitlestr}{Analysis and Modeling of Data Scraped from Spotify}
+ 	\newcommand{\groupnames}{J. Bockman, N. Bridges, Z. Prinsloo \& M. Vincent} 
+ 	\newcommand{\studentids}{a1627392, a1720433, a1703479 \& a1148120}
+ 	\newcommand{\authorstr}{\groupnames}
+ 	
+ 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+ 	% title page
+ 	\begin{titlepage}
+ 		\centering
+ 		
+ 		{\LARGE \bf \titlestr \par}
+ 		\vspace{0.25cm}
+ 		{\large \bf \shorttitlestr \par}
+ 		
+ 		
+ 		\vspace{1cm}
+ 		{\large \authorstr \par}
+ 		\vspace{0.05cm}
+ 		{\large  \studentids \par}
+ 		\vspace{0.25cm}
+ 		
+ 		\large School of Mathematical Sciences, The University of Adelaide
+ 		
+ 		\vspace{1cm}
+ 		\today
+ 		
+ 		\vspace{3cm}
+ 		Report submitted for
+ 		{\bf STATS 2107 Statistical Modelling and Inference}
+ 		School of Mathematical Sciences,
+ 		University of Adelaide
+ 		
+ 		\includegraphics[width=0.35\textwidth]{./Figures/UoA_logo_cmyk.pdf}
+ 		
+ 		\vspace{5cm}
+ 		
+ 		\begin{abstract}
+		\noindent This paper examines data taken from the online music streaming platform Spotify, and constructs a linear regression model for predicting song popularity. A description of the data used in the analysis is provided, along with the steps taken to clean it. Both univariate and bivariate analyses were undertaken prior to selecting the model. Model selection incorporated forward, backward and stepwise algorithms, and both the Akaike and Bayesian information criteria. The cross validated mean square error of each model in conjunction with complexity were used to select the final model. This resulted in a model that uses five of the eight available predictor variables; decade, danceability, loudness, energy and  duration, with two interaction terms between energy and duration, and decade and loudness. After the linear assumptions of the model were found to be valid, a prediction was made using new data. 
+ 		\end{abstract}
+ 	 	\vspace{1mm}
+ 		\noindent \hrulefill
+ 		
+ 		\vfill
+ \end{titlepage}
+\end{document}

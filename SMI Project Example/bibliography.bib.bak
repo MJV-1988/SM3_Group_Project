@@ -1,0 +1,10 @@
+% Encoding: UTF-8
+
+@Electronic{spotify,
+  author = {SpotifyAB},
+  year   = {2018},
+  title  = {Get Audio Features for a Track - Audio Features Object},
+  url    = {https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
