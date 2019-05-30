@@ -1,0 +1,333 @@
+---
+header-includes:
+  - \usepackage{booktabs}
+#title: "Statistical Modelling III - Group Assignment"
+#author: "Matthew Vincent"
+#date: "June, 2019"
+output:
+  pdf_document: default
+  html_notebook:
+    theme: lumen
+    toc: yes
+    toc_float: yes
+  html_document:
+    df_print: paged
+    toc: yes
+  fig_caption: yes
+---
+
+```{r Load Dependancies, warning=FALSE, message=FALSE, echo = FALSE}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(readxl)
+library(broom)
+library(reshape2)
+library(modelr)
+library(caret)
+# Missing Data Visualisations
+library(naniar)
+```
+
+```{r Global Chunk Options, echo = FALSE}
+# Won't print warnings, messages or results to the output documents by default
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, results = 'hide', echo = FALSE, fig.pos = 'h')
+options(knitr.table.format = 'markdown', width = 60)
+```
+
+```{r Loadd Custom Scripts}
+# Set working directory
+setwd("E:/Documents/GitHub/SM3_Group_Project")
+
+# Import libraries
+library(caret)
+
+# Load custom scripts 
+source('Scripts/crossValidate.R')
+```
+
+# 1. Introduction
+
+# 2. Data Description
+
+# 3. Cleaning
+
+### 3.1. Loading and Type Assignment
+
+
+### 3.2. Missing Values
+
+
+
+
+# 4. Description of Variables
+
+### 4.1. Continuous Variables
+
+
+### 4.2. Catagorical Variables
+
+
+# 5. Bivariate Analysis
+
+
+
+### 5.1. Continuous Variables
+
+
+
+
+### 5.2. Categorical Variables
+
+
+
+
+### 5.3. Bivariate Analysis Between Predictors
+
+
+
+# 6. Model Fitting
+
+To fit the linear model, forward, backward and step-wise algorithms for model selection were all used, with both the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC) as heuristics. Each of the model selection algorithms iteratively adds and/or removes terms using appropriate measures of significance, until the optimal model has been identified. The model with all terms available for inclusion is called the full model. The model with the least possible terms is the null model.
+
+The **forward** algorithm begins with the null model. At each iteration, the P-value is calculated for each term that is not currently included in the model. If the smallest P-value is less than a threshold (in our case 0.05), the term with that P-value is added to the model. The **backward** algorithm begins with the full model, and at each iteration, calculates the P-values for all terms in the model. If the highest P-value exceeds the chosen threshold, that term is removed from the model. This is repeated until all included terms are significant. The **stepwise** algorithm begins with the null model. At each iteration, one step of forward selection is performed, using a liberal P-value such as 0.20, and one step of backward elimination is performed using a lower P-value such as 0.05. This is repeated until no further changes occur in the model.
+
+Three different full models were considered. The first full model included all predictors but no interaction terms. The second used only those terms, either individual predictors or interactions between them, that were identified as significant in the previous section. The third included all predictor terms and all interaction terms. The criteria scores and k-fold mean square error for models obtained using each algorithm and heuristic are presented on Tables 3 and 4. 
+
+
+```{r fitting}
+# 1 - Read in the full dataset
+
+  # Read in headers
+  headers <- read.csv(file = "train.csv", skip = 1, header = F, nrows = 1, as.is = T)
+  
+  # Read in complete dataset
+  dat <- read.csv(file = "train.csv", skip = 2, header = F)
+  
+  # Add the headers to dataset
+  colnames(dat) <- headers
+  
+# 2 - Loop through every possible model, and train it using cross validation
+  
+  # get number of predictors and records in the dataset
+  n_predictors = ncol(dat)
+  n_row = nrow(dat)
+  
+  # Loop over the predictors - each loop we will generate all possible
+  # models up to the ith predictor
+  for(i in 1:n_predictors) {
+    
+    i
+    
+    # Get the number of possible combinations up to ith predictor
+    combs=combn(1:n_col,i)
+    
+    # Loop over all possible combinations
+    for(j in 1:ncol(combs)) {
+      
+    }
+  }
+```
+
+
+```{r}
+# # === AIC HUERISTIC MODELS ===
+# 
+# # Calculate AIC for each model
+# backward_1_AIC <- extractAIC(lm_1_backward)[2]
+# forward_1_AIC <- extractAIC(lm_1_forward)[2]
+# step_1_AIC <- extractAIC(lm_1_step)[2]
+# backward_2_AIC <- extractAIC(lm_2_backward)[2]
+# forward_2_AIC <- extractAIC(lm_2_forward)[2]
+# step_2_AIC <- extractAIC(lm_2_step)[2]
+# backward_3_AIC <- extractAIC(lm_3_backward)[2]
+# forward_3_AIC <- extractAIC(lm_3_forward)[2]
+# step_3_AIC <- extractAIC(lm_3_step)[2]
+# 
+# # Calculate BIC for each
+# backward_1_BIC <- BIC(lm_1_backward)
+# forward_1_BIC <- BIC(lm_1_forward)
+# step_1_BIC <- BIC(lm_1_step)
+# backward_2_BIC <- BIC(lm_2_backward)
+# forward_2_BIC <- BIC(lm_2_forward)
+# step_2_BIC <- BIC(lm_2_step)
+# backward_3_BIC <- BIC(lm_3_backward)
+# forward_3_BIC <- BIC(lm_3_forward)
+# step_3_BIC <- BIC(lm_3_step)
+# 
+# # Calculate cross validation for each model
+# backward_1_CV <- crossValidate( formula(lm_1_backward), reducedSpotify, 6 )
+# forward_1_CV <- crossValidate( formula(lm_1_forward), reducedSpotify, 6 )
+# step_1_CV <- crossValidate( formula(lm_1_step), reducedSpotify, 6 )
+# backward_2_CV <- crossValidate( formula(lm_2_backward), reducedSpotify, 6 )
+# forward_2_CV <- crossValidate( formula(lm_2_forward), reducedSpotify, 6 )
+# step_2_CV <- crossValidate( formula(lm_2_step), reducedSpotify, 6 )
+# backward_3_CV <- crossValidate( formula(lm_3_backward), reducedSpotify, 6 )
+# forward_3_CV <- crossValidate( formula(lm_3_forward), reducedSpotify, 6 )
+# step_3_CV <- crossValidate( formula(lm_3_step), reducedSpotify, 6 )
+# 
+# # === BIS HUERISTIC MODELS ===
+# # Calculate AIC for each model
+# backward_1_AIC_B <- extractAIC(lm_1_backward_BIC)[2]
+# forward_1_AIC_B <- extractAIC(lm_1_forward_BIC)[2]
+# step_1_AIC_B <- extractAIC(lm_1_step_BIC)[2]
+# backward_2_AIC_B <- extractAIC(lm_2_backward_BIC)[2]
+# forward_2_AIC_B <- extractAIC(lm_2_forward_BIC)[2]
+# step_2_AIC_B <- extractAIC(lm_2_step_BIC)[2]
+# backward_3_AIC_B <- extractAIC(lm_3_backward_BIC)[2]
+# forward_3_AIC_B <- extractAIC(lm_3_forward_BIC)[2]
+# step_3_AIC_B <- extractAIC(lm_3_step_BIC)[2]
+# 
+# # Calculate BIC for each
+# backward_1_BIC_B <- BIC(lm_1_backward_BIC)
+# forward_1_BIC_B <- BIC(lm_1_forward_BIC)
+# step_1_BIC_B <- BIC(lm_1_step_BIC)
+# backward_2_BIC_B <- BIC(lm_2_backward_BIC)
+# forward_2_BIC_B <- BIC(lm_2_forward_BIC)
+# step_2_BIC_B <- BIC(lm_2_step_BIC)
+# backward_3_BIC_B <- BIC(lm_3_backward_BIC)
+# forward_3_BIC_B <- BIC(lm_3_forward_BIC)
+# step_3_BIC_B <- BIC(lm_3_step_BIC)
+# 
+# # Calculate cross validation for each model
+# backward_1_CV_B <- crossValidate( formula(lm_1_backward_BIC), reducedSpotify, 6 )
+# forward_1_CV_B <- crossValidate( formula(lm_1_forward_BIC), reducedSpotify, 6 )
+# step_1_CV_B <- crossValidate( formula(lm_1_step_BIC), reducedSpotify, 6 )
+# backward_2_CV_B <- crossValidate( formula(lm_2_backward_BIC), reducedSpotify, 6 )
+# forward_2_CV_B <- crossValidate( formula(lm_2_forward_BIC), reducedSpotify, 6 )
+# step_2_CV_B <- crossValidate( formula(lm_2_step_BIC), reducedSpotify, 6 )
+# backward_3_CV_B <- crossValidate( formula(lm_3_backward_BIC), reducedSpotify, 6 )
+# forward_3_CV_B <- crossValidate( formula(lm_3_forward_BIC), reducedSpotify, 6 )
+# step_3_CV_B <- crossValidate( formula(lm_3_step_BIC), reducedSpotify, 6 )
+```
+
+```{r Model Summary AIC}
+
+# # Store model selection measures in dataframe
+# model_summary <- data.frame(
+#   c(backward_1_AIC,forward_1_AIC,step_1_AIC,backward_2_AIC,forward_2_AIC,
+#     step_2_AIC,backward_3_AIC,forward_3_AIC,step_3_AIC),
+#   c(backward_1_BIC,forward_1_BIC,step_1_BIC,backward_2_BIC,forward_2_BIC,
+#     step_2_BIC,backward_3_BIC,forward_3_BIC,step_3_BIC),
+#   c(backward_1_CV,forward_1_CV,step_1_CV,backward_2_CV,forward_2_CV,
+#     step_2_CV,backward_3_CV,forward_3_CV,step_3_CV)
+#   ) %>%
+#   lapply(round, 1)
+# 
+# model_summary <- data.frame(
+#   c("Backward", "Forward", "Step","Back", "Forward", "Step",
+#     "Back", "Forward", "Step"),
+#   model_summary)
+# 
+# # Label columns and rows
+# colnames(model_summary) <- c("Algorithm", "AIC",
+#                              "BIC", "k-Fold MSE")
+# 
+# model_summary <- t(model_summary)
+# 
+# kableModelsAIC <- model_summary %>%
+#   kable(digits = 1, caption = "Summary of metrics used to assess the different
+#         models produced from various scopes using different methods. Each method
+#         used the Aikaike Information Criterion as a heuristic. \\label{AICModles}",
+#         format = "latex", booktabs = T) %>%
+#   add_header_above(c(" " = 1, "No Interactions" = 3, "Only Significant Terms" = 3, "All Terms" = 3)) %>%
+#   add_header_above(c(" " = 1, "Heuristic - Akaike Information Criterion" = 9))
+
+```
+
+
+
+
+
+```{r Model Summary BIC}
+
+# # Store model selection measures in dataframe
+# model_summary <- data.frame(
+#   c(backward_1_AIC_B, forward_1_AIC_B, step_1_AIC_B, backward_2_AIC_B, forward_2_AIC_B,
+#     step_2_AIC_B, backward_3_AIC_B, forward_3_AIC_B, step_3_AIC_B),
+#   c(backward_1_BIC_B, forward_1_BIC_B, step_1_BIC_B, backward_2_BIC_B, forward_2_BIC_B,
+#     step_2_BIC_B, backward_3_BIC_B, forward_3_BIC_B, step_3_BIC_B),
+#   c(backward_1_CV_B, forward_1_CV_B, step_1_CV_B,backward_2_CV_B, forward_2_CV_B,
+#     step_2_CV_B, backward_3_CV_B, forward_3_CV_B, step_3_CV_B)
+#   ) %>%
+#   lapply(round, 1)
+# 
+# model_summary <- data.frame(
+#   c("Backward", "Forward", "Step","Back", "Forward", "Step",
+#     "Back", "Forward", "Step"),
+#   model_summary)
+# 
+# # Label columns and rows
+# colnames(model_summary) <- c("Algorithm", "AIC",
+#                              "BIC", "k-Fold MSE")
+# 
+# model_summary <- t(model_summary)
+# 
+# kableModelsBIC <- model_summary %>%
+#   kable(digits = 1, caption = "Summary of metrics used to assess the different
+#         models produced from various scopes using different methods. Each method
+#         used the Bayesian Information Criterion as a heuristic. \\label{BICModles}",
+#         format = "latex", booktabs = T) %>%
+#   add_header_above(c(" " = 1, "No Interactions" = 3, "Only Significant Terms" = 3, "All Terms" = 3)) %>%
+#   add_header_above(c(" " = 1, "Heuristic - Bayesian Information Criterion" = 9))
+
+```
+
+
+
+```{r Model Formulas}
+# sprintf("AIC")
+# formula(lm_1_backward)
+# formula(lm_1_forward)
+# formula(lm_1_step)
+# 
+# formula(lm_2_backward)
+# formula(lm_2_forward)
+# formula(lm_2_step)
+# 
+# formula(lm_3_backward)
+# formula(lm_3_forward)
+# formula(lm_3_step)
+# 
+# sprintf("BIC")
+# formula(lm_1_backward_BIC)
+# formula(lm_1_forward_BIC)
+# formula(lm_1_step_BIC)
+# 
+# formula(lm_2_backward_BIC)
+# formula(lm_2_forward_BIC)
+# formula(lm_2_step_BIC)
+# 
+# formula(lm_3_backward_BIC)
+# formula(lm_3_forward_BIC)
+# formula(lm_3_step_BIC)
+```
+
+\clearpage
+
+Using the first full model, where no interaction terms were included, led to the selection of the same best model irrespective of algorithm or heuristic. The AIC for this model was the highest overall. The BIC was somewhat lower, though not the lowest overall. The k-fold MSE scores were the highest. Given these results, this model was a poor candidate for final selection. 
+
+For the remaining two models, we found that the best models obtained from using the BIC heuristic contained substantially fewer terms than the those obtained under AIC. Despite being much smaller models, those obtained under the BIC heuristic were not penalised with higher significantly higher AIC or MSE scores. Therefore, it was determined that the final model would be selected from among those obtained using the BIC heuristic. Of these, the forward algorithm produced models with higher MSE than those of backward and step-wise. For the two remaining full models, backward and step-wise algorithms arrived at the same best model in each case. Of these two models, there was very little difference in MSE, so it was determined that the simplest model would be chosen as the final model. 
+
+
+# 7. Final Model
+
+
+
+# 8. Assumption Checking
+
+
+
+# 9. Prediction
+
+
+
+
+
+# 10. Conclusion
+
+
+
+# Reference
+
+
