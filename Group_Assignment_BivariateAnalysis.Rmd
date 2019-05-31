@@ -1,0 +1,224 @@
+---
+title: "SM_3_GroupAssignment_Bivariate Analysis"
+author: "Cooper"
+date: "23/05/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# 5 Bivariate Analysis
+
+```{r dat, echo=FALSE}
+headers <- read.csv(file = "train.csv", skip = 1, header = F, nrows = 1, as.is = TRUE)
+# Read in complete dataset
+dat <- read.csv(file = "train.csv", skip = 2, header = FALSE)
+# Add the headers to dataset
+colnames(dat) <- headers
+```
+
+In order to determine the nature and strength of the relationship between each predictor variable and the response variable, default payment next month, plots of each of these relationships will be produced and investigated. Determing the relative associations of these predictor variables is important, as it allows us to consider the implication of their inclusion in the final model.
+
+## 5.1 Continous Variables
+We will begin by considering the relationship of the continuous predictor variables against default payment next month. These relationships will be analysed using side-by-side box plots.
+
+## 5.1.1 Limiting Balance against default payment next month
+
+Given limiting balance is the amount of credit available to an individual, in NT dollars, the main areas of interest will be whether having a higher or lower limiting balance will influence defaulting next month's payment. We will investigate this using side-by-side box plots, shown below.
+
+```{r LIMT_BAL, echo=FALSE}
+ggplot(aes(x=as.factor(`default payment next month`), y=LIMIT_BAL, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between Limiting Balance and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("Limiting Balance") + xlab("Default Payment Next Month")
+```
+
+From observing the box plots above, it is clear that both levels of default payment next month are positively skewed.
+We also see that the medians for both levels lie marginally closer to the lower quartile value than the upper. Although the upper and lower quartile values for those who do not default next month's payment lie above those who do respectively, the interquartile range for both levels overlap. Consider the median values for both levels shown below.
+
+```{r LIMT_BAL medians}
+print(median(dat$LIMIT_BAL[dat$`default payment next month`==0]))
+print(median(dat$LIMIT_BAL[dat$`default payment next month`==1]))
+```
+
+The median limiting balance for those who do not default next month's payment is 150000, and 90000 for those who do default next month's payment. Thus it could be suggested that having a larger limiting balance amount may decrease the likelihood of defaulting next month's payment, however there is not sufficiently strong evidence to definitively conlude this. It should also be noted that both levels have potential outlier candidates.
+
+## 5.1.2 Age against default payment next month
+
+The next variable to be considered is Age, another integer variable taking values between 21 and 75. The relationship between Age and default payment next month will be investigated through side-by-side box plots.
+
+```{r AGE, echo=FALSE}
+ggplot(aes(x=as.factor(`default payment next month`), y=AGE, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between Age and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("Age") + xlab("Default Payment Next Month")
+```
+
+From observing the side-by-side box plots, we notice that both are positively skewed. Furthermore, the spread and median values for both levels of default payment next month are very similar, suggesting that there is no apparent trend for defaulting next month's payment based on Age.
+
+```{r AGE medians}
+print(quantile(dat$AGE[dat$`default payment next month`==0]))
+print(quantile(dat$AGE[dat$`default payment next month`==1]))
+```
+
+Upon further inspection, the median values and the lower quartile values are the same for both levels, begin 34 and 28 respectively. Additionally, the upper quartile values for those who do default next month's payment and those who do not are  42 and 41 respectively. This further supports the suggestion that age does not influence whether or not next month's payment is defaulted. There are also potential outlier candidates for both levels.
+
+## 5.1.3 Pay_X against default payment next month
+PAY_X is a measure of an individual's payment history, with:
+
+1. PAY_6 corresponding to the individuals payment in April.
+
+2. PAY_5 corresponding to the individuals payment in May.
+
+3. PAY_4 corresponding to the individuals payment in June.
+
+4. PAY_3 corresponding to the individuals payment in July.
+
+5. PAY_2 corresponding to the individuals payment in August.
+
+6. PAY_0 corresponding to the individuals payment in September.
+
+Each PAY_X is an integer variable, taking values between -2 and 8 (corresponding to month's the payment of that month was overdue). Hence, the relationship between Pay_X and default payment next month will be investigated using side-by-side boxplots.
+
+
+```{r PAY_x, echo=FALSE}
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_0, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_0 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_0") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_2") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_3") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_4") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_5") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_6") + xlab("Default Payment Next Month")
+
+```
+
+Observing these plots, we see that they are all positively skewed, with relatively low median values for both factor levels. Furthermore, other than for PAY_0, the median for both levels are equal. However, the upper quartile for all plots, other than PAY_6, is larger for those who do default next month's payment. Intuitively this makes sense, as we would expect defaulting next month's payment to be more likely if previous month's payments have also been late. There are also outlier candidates present in each of the plots.
+
+## 5.1.4 BILL_AMTX against default payment next month
+BILL_AMTX is the amount appearing on the bill statement as follows:
+
+1. BILL_AMT6 corresponding to the individuals statement in April.
+
+2. BILL_AMT5 corresponding to the individuals statement in May.
+
+3. BILL_AMT4 corresponding to the individuals statement in June.
+
+4. BILL_AMT3 corresponding to the individuals statement in July.
+
+5. BILL_AMT2 corresponding to the individuals statement in August.
+
+6. BILL_AMT1 corresponding to the individuals statement in September.
+
+As BILL_AMTX is a numeric variable, we will investigate its relationship with default payment next month using side-by-side boxplots.
+
+```{r BILL_AMTX, echo=FALSE}
+ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT1, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT1 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT1") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT2") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT3") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT4") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT5") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT6") + xlab("Default Payment Next Month")
+```
+
+We see that all of these plots are positively skewed. Additionally, all side-by-side boxplots show that the median values for both levels of default payment next month lie withtin very close proximity of each other. Furthermore, there is also close similarities with the interquartile spread in each plot.
+
+```{r BILL_AMTX medians}
+print(Med_Def0 <- c(median(dat$BILL_AMT1[dat$`default payment next month`==0]), median(dat$BILL_AMT2[dat$`default payment next month`==0]), median(dat$BILL_AMT3[dat$`default payment next month`==0]), median(dat$BILL_AMT4[dat$`default payment next month`==0]), median(dat$BILL_AMT5[dat$`default payment next month`==0]), median(dat$BILL_AMT6[dat$`default payment next month`==0])))
+
+print(Med_Def1 <- c(median(dat$BILL_AMT1[dat$`default payment next month`==1]), median(dat$BILL_AMT2[dat$`default payment next month`==1]), median(dat$BILL_AMT3[dat$`default payment next month`==1]), median(dat$BILL_AMT4[dat$`default payment next month`==1]), median(dat$BILL_AMT5[dat$`default payment next month`==1]), median(dat$BILL_AMT6[dat$`default payment next month`==1])))
+
+```
+
+Inspecting the median values for the 6 plots shows that the median value for BILL_AMT1, BILL_AMT2 AND BILL_AMT3 are higher for those who do not default next month's payment, where as this is reversed for BILL_AMT4, BILL_AMT5 and BILL_AMT6. This suggests that having a higher bill amount in recent month's will, in general, reduce the likelihood of defaulting next month's payment. However, the overlap in interquartile spread suggests that this influence is minimal. There are once again outlier candidates for both levels of default payment next month.
+
+## 5.1.5 PAY_AMTX against default payment next month
+PAY_AMTX is the amount of the previous payment, with:
+
+1. PAY_AMT6 corresponding to the payment made in April.
+
+2. PAY_AMT5 corresponding to the payment made in May.
+
+3. PAY_AMT4 corresponding to the payment made in June.
+
+4. PAY_AMT3 corresponding to the payment made in July.
+
+5. PAY_AMT2 corresponding to the payment made in August.
+
+6. PAY_AMT1 corresponding to the payment made in September.
+
+As PAY_AMTX is a numeric variable, we will investigate its relationship with default payment next month using side-by-side boxplots.
+
+```{r PAY_AMTX, echo=FALSE}
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_AMT1, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_AMT1 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_AMT1") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_AMT2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_AMT2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_AMT2") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_AMT3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_AMT3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_AMT3") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_AMT4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_AMT4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_AMT4") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_AMT5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_AMT5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_AMT5") + xlab("Default Payment Next Month")
+
+ggplot(aes(x=as.factor(`default payment next month`), y=PAY_AMT6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_AMT6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_AMT6") + xlab("Default Payment Next Month")
+```
+
+We see that all of these plots are positively skewed. Additionally, all side-by-side boxplots show that the median, lower quartile and upper quartile values lie within very close proximity. 
+
+```{r PAY_AMTX medians}
+print(Median_Def0 <- c(median(dat$PAY_AMT1[dat$`default payment next month`==0]), median(dat$PAY_AMT2[dat$`default payment next month`==0]), median(dat$PAY_AMT3[dat$`default payment next month`==0]), median(dat$PAY_AMT4[dat$`default payment next month`==0]), median(dat$PAY_AMT5[dat$`default payment next month`==0]), median(dat$PAY_AMT6[dat$`default payment next month`==0])))
+
+print(Median_Def1 <- c(median(dat$PAY_AMT1[dat$`default payment next month`==1]), median(dat$PAY_AMT2[dat$`default payment next month`==1]), median(dat$PAY_AMT3[dat$`default payment next month`==1]), median(dat$PAY_AMT4[dat$`default payment next month`==1]), median(dat$PAY_AMT5[dat$`default payment next month`==1]), median(dat$PAY_AMT6[dat$`default payment next month`==1])))
+
+```
+
+Upon further inspection, the median values are marginally larger for those who do not default next month's payment, so there may be a very small influence. There are outlier candidates for both levels of default payment next month.
+
+## 5.2 Categorical Variables
+We now consider the relationship between the categorical predictor variables and the response variable. These will be explored using side-by-side box plots where appropriate, otherwise analysing the mean values.
+
+## 5.2.1 Sex against default payment next month
+
+The next variable to be considered is Sex. As Sex and default payment next month are both integer variables with two levels (0 and 1 for default payment next month, 1 and 2 for sex) their relationship will be investigated by considering the default rates for both males and females.
+
+```{r SEX, echo=FALSE}
+print(male_def <- sum(dat$`default payment next month`[dat$SEX==1])/sum(dat$SEX==1))
+print(female_def <- sum(dat$`default payment next month`[dat$SEX==2])/sum(dat$SEX==2))
+```
+
+Considering the above output, approximately 29.10\% of males defaulted next month's payment, whereas only 25.23\% did. This suggests that males may be more likely, on average, to default next month's payment.
+
+## 5.2.2 Education against default payment next month
+
+Education is another integer variable, taking 7 different levels, ranging from 0 to 6. We will once again consider side-by-side boxplots to investigate their relationship.
+
+```{r Education, echo=FALSE}
+ggplot(aes(x=as.factor(`default payment next month`), y=EDUCATION, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between Education and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("Education") + xlab("Default Payment Next Month")
+mean(dat$EDUCATION[dat$`default payment next month`==0])
+mean(dat$EDUCATION[dat$`default payment next month`==1])
+```
+
+Not sure if we really need a plot for this one??
+
+The mean level of education for those who do not default next month's payment is 1.84, whereas for those who do it's 1.89. Due to how close these are in value, it is unreasonable to suggest that the level of education of an individual will effect whether or not they default.
+
+## 5.2.3 Marriage against default payment next month
+
+We will now consider Marriage, another integer variable with four levels (0 up to 3). Because there are only four levels, no plot will be considered to investigate their relationship.
+
+```{r MARRIAGE, echo=TRUE}
+print(mean(dat$MARRIAGE[dat$`default payment next month`==0]))
+print(mean(dat$MARRIAGE[dat$`default payment next month`==1]))
+```
+
+The mean marriage value for those who do not default next month's payment is 1.56, whereas this value is 1.53 for those who do. These values are once again so close in value that there is no suggestion of a relationship between these two variables.
+
+## 5.3 Bivariate Analysis Between Predictors
