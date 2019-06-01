@@ -1,0 +1,101 @@
+---
+title: "Cleaning and Variable Analysis"
+header-includes:
+  - \usepackage{float}
+  - \usepackage{longtable}
+  - \usepackage{array}
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse) #ggplot, data manipulation tools
+library(MASS) #extract residuals, do boxcox etc.
+```
+
+\section{Cleaning and Preparing the Data}
+```{r}
+dat = read.csv("train.csv", skip = 1)
+validInd = sample(1:nrow(dat), nrow(dat)/4) 
+train = dat[-validInd, ]
+valid = dat[validInd, ]
+trainX = train[ ,1:(ncol(dat)-1)]
+trainY = train[ ,ncol(dat)]
+validX = valid[ ,1:(ncol(dat)-1)]
+validY = valid[ ,ncol(dat)]
+```
+
+
+\section{Univariate Analysis}
+
+
+\subsection{Variable Descriptions}
+\begin{table}[h!]
+\centering
+\footnotesize
+\centering
+\caption{Description of variables in the data set.}
+\label{Table:VarDesc}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{| c || c | c | p{'10cm}|}
+\hline
+\textbf{Variable Name} & \textbf{Data Type} & \textbf{Role in model} &\textbf{Description}\\ \hline\hline
+\texttt{default payment next month} & \texttt{Factor} & \texttt{Response} &1 = a default payment, 0 = no default\\ \hline
+\texttt{LIMIT\_BAL} & \texttt{Numeric} & \texttt{Predictor} & Amount of credit of an individual, in NT dollars\\ \hline
+\texttt{SEX} & \texttt{Factor} & \texttt{Predictor} & Sex of an individual; 1 = male, 2 = female\\ \hline
+\texttt{EDUCATION} & \texttt{Factor} & \texttt{Predictor} & Education status of an individual; 1 = graduate school, 2 = university, 3 = high school, 4 = other education\\ \hline
+\texttt{MARRIAGE} & \texttt{Factor} & \texttt{Predictor} & Martial status of an individual; 1 = married, 2 = single, 3 = other\\ \hline
+\texttt{AGE} & \texttt{Numeric} & \texttt{Predictor} & Age of an individual\\ \hline
+\texttt{PAY\_0} to \texttt{PAY\_6} & \texttt{Factor} & \texttt{Predictor} & History of payment of an individual, from April (\texttt{PAY\_6}) to September (\texttt{PAY\_0}) 2015; -1 = on time, other values are months of delay in repayment\\ \hline
+\texttt{BILL\_AMT1} to \texttt{BILL\_AMT6} & \texttt{Numeric} & \texttt{Predictor} & Amount of bill statement, from April (\texttt{BILL\_AMT6}) to September (\texttt{BILL\_AMT1}) 2015, in NT dollars\\ \hline
+\texttt{PAY\_AMT1} to \texttt{PAY\_AMT6} & \texttt{Numeric} & \texttt{Predictor} & Amount of previous payment, from April (\texttt{PAY\_AMT6}) to September (\texttt{PAY\_AMT1}) 2015, in NT dollars\\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Univariate Plots}
+```{r, fig.width=4, fig.height = 3}
+ggplot(dat, aes(x = default.payment.next.month)) +
+  geom_histogram(bins = 2, col = "black") +
+  ggtitle("Histogram of Default Payment Last Month (name?)") +
+  xlab("Default Payment Last Month")
+```
+```{r, fig.width=4, fig.height = 3}
+ggplot(dat, aes(x = LIMIT_BAL)) +
+  geom_histogram(bins = 50, col = "black") +
+  ggtitle("Histogram of LIMIT_BAL") +
+  xlab("Amount of credit of an individual")
+```
+
+```{r, fig.width=4, fig.height = 3}
+ggplot(dat, aes(x = SEX)) +
+  geom_histogram(bins = 2, col = "black") +
+  ggtitle("Histogram of Sex") +
+  xlab("Sex of an individual; 1 = male, 2 = female")
+```
+
+```{r, fig.width=4, fig.height = 3}
+ggplot(dat, aes(x = EDUCATION)) +
+  geom_histogram(bins = 4, col = "black") +
+  ggtitle("Histogram of Education") +
+  xlab("Education of an individual")
+```
+```{r, fig.width=4, fig.height = 3}
+ggplot(dat, aes(x = MARRIAGE)) +
+  geom_histogram(bins = 4, col = "black") +
+  ggtitle("Histogram of Marriage") +
+  xlab("Martial status of an individual; 0 = ???, 1 = married, \n 2 = single, 3 = high school, 4 = other")
+```
+
+```{r, fig.width=4, fig.height = 3}
+ggplot(dat, aes(x = AGE)) +
+  geom_histogram(binwidth = 1, col = "black") +
+  ggtitle("Histogram of Age") +
+  xlab("Age of an individual")
+```
+
+
+
+
+
