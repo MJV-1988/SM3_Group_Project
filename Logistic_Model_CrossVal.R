@@ -10,7 +10,7 @@
   
   # Import libraries
   library(caret)
-  library(ggplot2)
+  library(tidyverse)
 
   # Load custom scripts 
   source('Scripts/crossValidate.R')
@@ -27,36 +27,30 @@
   colnames(dat) <- headers
   
   # Remove the ID field
-  
+  dat <- dat[ ,-1]
   
   # get number of predictors and records in the dataset
   n_predictors = ncol(dat)-1
   n_row = nrow(dat)
   
-  # Set the number of records in validation set (pick a %)
-  N = 0.2 * n_row
+  # Split the predictors and response
+  train.x = data.frame(dat[ ,1:(ncol(dat)-1)])
+  train.y = data.frame(dat[ ,ncol(dat)])
   
-  # Separate into training and validation sets
-  validInd = sample(1:nrow(dat), N)
-  train = dat[-validInd, -1]
-  val = dat[validInd, -1]
-  train.x = train[ ,1:(ncol(train)-1)]
-  train.y = train[ ,ncol(train)]
-  val.x = val[ ,1:(ncol(train)-1)]
-  val.y = val[ ,ncol(train)]
+  # Rename response for brevity, and set as factor
+  names(dat)[ncol(dat)]<-"y"
+  y = as.factor(y)
   
-  # Set up containers for error estimates
-  training = rep(0,2^4)
-  validation = rep(0,2^4)
-  model.size = rep(0,2^4)
+  # Set up containers for accuracy and model size
+  mdl.accuracy = matrix(rep(0,2^4), ncol = 2)
+  mdl.size = rep(0,2^4)
   
 # 2 - LOOP OVER ALL POSSIBLE MODELS, STORE ERROR ESTIMATES FOR EACH
   
-  # Firstly get error estimates for the null model
+  # Firstly get cross validated results for the null model
   k = 1
-  model = glm(train.y~1, family = binomial(logit))
-  training[k] = mean((train.y-fitted(model))^2)
-  validation[k] = mean((val.y-mean(train.y))^2) # <--- don't understand this
+  tr.object = train(y~SEX+EDUCATION, data=dat, method="glm", family=binomial(logit), trControl=trainControl(method="cv"))
+  tr.object$results$Accuracy
   
   # Loop over the number of predictors to generate all other possible models
   # Each loop, i is the number of included predictors
@@ -73,28 +67,22 @@
       # Extract the training dataset with just the included predictors
       train.z = train.x[,combs[,j]]
       
-      val.z = cbind(1,val.x[,combs[,j]])
-      
-      model = glm(train.y~train.z, family = binomial(logit))
-      
-      val.fit = val.z %*% coef(model)
+      # Perform cross validation
+      tr.object = train(y~train.z, data=dat, method="glm", family=binomial(logit), trControl=trainControl(method="cv"))
       
       # Increment k to store results to correct position in error vectors
-      k = k+1
+      k = k+1      
       
       # Set the model size to the current number of predictors 
       model.size[k] = i
-      
-      # Store the error results of the current model
-      training[k] = mean((train.y-fitted(model))^2)
-      validation[k] = mean((val.y-val.fit)^2)
+      mdl.accuracy[k,1] = tr.object$results$Accuracy
+      mdl.accuracy[k,1] = tr.object$results$AccuracySD
     }
   }
 
   # Concat results vectors into single dataframe
-  results = data.frame(index=c(1:16), model.size, training, validation)
+  results = data.frame(index=c(1:16), mdl.size, mdl.accuracy)
 
-  
 
   
 
