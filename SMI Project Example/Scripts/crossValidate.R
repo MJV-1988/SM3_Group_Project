@@ -1,5 +1,6 @@
-crossValidate <- function( formula, data, k )
-{
+
+crossValidate <- function( formula, data, k ) {
+  
   folds <- crossv_kfold( data, k )
   models <- map( folds$train, ~lm( formula, data = . ) )
   get_pred <- function( model, test_data ){ return( add_predictions( as.data.frame(test_data), model ) ) }
@@ -9,4 +10,5 @@ crossValidate <- function( formula, data, k )
     summarise( MSE = mean( ( popularity - pred )^2 ), n=n() )
   CV <- sum( MSE$MSE * MSE$n ) / sum( MSE$n )
   return(CV)
+  
 }

@@ -11,8 +11,9 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse) #ggplot, data manipulation tools
-library(MASS) #extract residuals, do boxcox etc.
+library(tidyverse)  # ggplot, data manipulation tools
+library(gridExtra)  # arrange plots
+library(MASS)       # extract residuals, do boxcox etc.
 ```
 
 \section{Cleaning and Preparing the Data}
@@ -55,44 +56,41 @@ validY = valid[ ,ncol(dat)]
 \end{table}
 
 \subsection{Univariate Plots}
-```{r, fig.width=4, fig.height = 3}
-ggplot(dat, aes(x = default.payment.next.month)) +
+
+```{r echo=FALSE, fig.height=10, fig.width=10}
+
+p1 <- ggplot(dat, aes(x = default.payment.next.month)) +
   geom_histogram(bins = 2, col = "black") +
   ggtitle("Histogram of Default Payment Last Month (name?)") +
   xlab("Default Payment Last Month")
-```
-```{r, fig.width=4, fig.height = 3}
-ggplot(dat, aes(x = LIMIT_BAL)) +
+
+p2 <- ggplot(dat, aes(x = LIMIT_BAL)) +
   geom_histogram(bins = 50, col = "black") +
   ggtitle("Histogram of LIMIT_BAL") +
   xlab("Amount of credit of an individual")
-```
 
-```{r, fig.width=4, fig.height = 3}
-ggplot(dat, aes(x = SEX)) +
+p3 <- ggplot(dat, aes(x = SEX)) +
   geom_histogram(bins = 2, col = "black") +
   ggtitle("Histogram of Sex") +
   xlab("Sex of an individual; 1 = male, 2 = female")
-```
 
-```{r, fig.width=4, fig.height = 3}
-ggplot(dat, aes(x = EDUCATION)) +
+p4 <- ggplot(dat, aes(x = EDUCATION)) +
   geom_histogram(bins = 4, col = "black") +
   ggtitle("Histogram of Education") +
   xlab("Education of an individual")
-```
-```{r, fig.width=4, fig.height = 3}
-ggplot(dat, aes(x = MARRIAGE)) +
+
+p5 <- ggplot(dat, aes(x = MARRIAGE)) +
   geom_histogram(bins = 4, col = "black") +
   ggtitle("Histogram of Marriage") +
   xlab("Martial status of an individual; 0 = ???, 1 = married, \n 2 = single, 3 = high school, 4 = other")
-```
 
-```{r, fig.width=4, fig.height = 3}
-ggplot(dat, aes(x = AGE)) +
+p6 <- ggplot(dat, aes(x = AGE)) +
   geom_histogram(binwidth = 1, col = "black") +
   ggtitle("Histogram of Age") +
   xlab("Age of an individual")
+
+# Output plots in 3x2 grid
+grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
 ```
 
 

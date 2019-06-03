@@ -11,6 +11,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(gridExtra)
 ```
 
 # 5 Bivariate Analysis
@@ -81,19 +82,21 @@ PAY_X is a measure of an individual's payment history, with:
 Each PAY_X is an integer variable, taking values between -2 and 8 (corresponding to month's the payment of that month was overdue). Hence, the relationship between Pay_X and default payment next month will be investigated using side-by-side boxplots.
 
 
-```{r PAY_x, echo=FALSE}
-ggplot(aes(x=as.factor(`default payment next month`), y=PAY_0, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_0 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_0") + xlab("Default Payment Next Month")
+```{r PAY_x, echo=FALSE, fig.height=10, fig.width=10}
+p1 <- ggplot(aes(x=as.factor(`default payment next month`), y=PAY_0, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_0 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_0") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=PAY_2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_2") + xlab("Default Payment Next Month")
+p2 <- ggplot(aes(x=as.factor(`default payment next month`), y=PAY_2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_2") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=PAY_3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_3") + xlab("Default Payment Next Month")
+p3 <- ggplot(aes(x=as.factor(`default payment next month`), y=PAY_3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_3") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=PAY_4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_4") + xlab("Default Payment Next Month")
+p4 <- ggplot(aes(x=as.factor(`default payment next month`), y=PAY_4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_4") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=PAY_5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_5") + xlab("Default Payment Next Month")
+p5 <- ggplot(aes(x=as.factor(`default payment next month`), y=PAY_5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_5") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=PAY_6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_6") + xlab("Default Payment Next Month")
+p6 <- ggplot(aes(x=as.factor(`default payment next month`), y=PAY_6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between PAY_6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("PAY_6") + xlab("Default Payment Next Month")
 
+# Output plots in 3x2 grid
+grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
 ```
 
 Observing these plots, we see that they are all positively skewed, with relatively low median values for both factor levels. Furthermore, other than for PAY_0, the median for both levels are equal. However, the upper quartile for all plots, other than PAY_6, is larger for those who do default next month's payment. Intuitively this makes sense, as we would expect defaulting next month's payment to be more likely if previous month's payments have also been late. There are also outlier candidates present in each of the plots.
@@ -115,18 +118,21 @@ BILL_AMTX is the amount appearing on the bill statement as follows:
 
 As BILL_AMTX is a numeric variable, we will investigate its relationship with default payment next month using side-by-side boxplots.
 
-```{r BILL_AMTX, echo=FALSE}
-ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT1, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT1 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT1") + xlab("Default Payment Next Month")
+```{r BILL_AMTX, echo=FALSE, fig.height=10, fig.width=10}
+p1 <- ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT1, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT1 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT1") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT2") + xlab("Default Payment Next Month")
+p2 <- ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT2, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT2 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT2") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT3") + xlab("Default Payment Next Month")
+p3 <- ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT3, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT3 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT3") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT4") + xlab("Default Payment Next Month")
+p4 <- ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT4, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT4 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT4") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT5") + xlab("Default Payment Next Month")
+p5 <- ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT5, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT5 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT5") + xlab("Default Payment Next Month")
 
-ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT6") + xlab("Default Payment Next Month")
+p6 <- ggplot(aes(x=as.factor(`default payment next month`), y=BILL_AMT6, group=`default payment next month`),data=dat) + geom_boxplot() + ggtitle("Relationship between BILL_AMT6 and \n default payment next month") + theme(plot.title = element_text(hjust = 0.5)) + ylab("BILL_AMT6") + xlab("Default Payment Next Month")
+
+# Output plots in 3x2 grid
+grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
 ```
 
 We see that all of these plots are positively skewed. Additionally, all side-by-side boxplots show that the median values for both levels of default payment next month lie withtin very close proximity of each other. Furthermore, there is also close similarities with the interquartile spread in each plot.
