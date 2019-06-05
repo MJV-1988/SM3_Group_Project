@@ -1,0 +1,203 @@
+---
+title: "Group Project Model Selection"
+author: "Matthew Vincent"
+date: "05/06/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Import libraries
+library(tidyverse)
+library(caret)
+
+setwd("E:/Documents/GitHub/SM3_Group_Project")
+```
+
+
+
+```{r}
+# Read in the headers
+headers <- read.csv(file = "train.csv", skip=1, header=F, nrows=1, as.is=T)
+
+# Read in complete dataset
+dat <- read.csv(file = "train.csv", skip = 2, header = F)
+
+# Add the headers to dataset
+colnames(dat) <- headers
+
+# Remove the ID field
+dat <- dat[ ,-1]
+
+# Rename response variable for brevity and set as factor
+names(dat)[ncol(dat)]<-"y"
+dat$y = as.factor(dat$y)
+
+# Split into x and y datasets
+# X <- dat[ ,1:(ncol(dat)-1)]
+# y <- dat[ ,ncol(dat)]
+
+# Split into training and test set
+set.seed(3456)
+trainIndex <- createDataPartition(dat$y, p = .7, list = FALSE, times = 1)
+train.set <- dat[trainIndex,]
+test.set <- dat[-trainIndex,]
+```
+
+## Feature Selection
+
+Choosing an appropriate subset from the available predcitor variables is an important step in selecting an accurate model. While the exclusion of important predictors will produce an incorrect model, adding too many redundant predictor terms can overcomplicate the model, making it harder to interpret without improving its accuracy. It can also reduce the statistical accuracy of parameter estimates. In machine learning, the process of selecting predictor variables for a model is know as *feature selection*. 
+
+We perform feature selection on the credit dataset using the Recursive Feature Elimination, which is a backwards selection technique that begins with all available features, and iteratively eliminates the least important ones.    
+
+```{r eval=FALSE, include=FALSE}
+# Preprocess data first
+# normalized <- preProcess(X)
+
+subsets <- (1:5)
+
+set.seed(10)
+
+ctrl <- rfeControl(functions = lmFuncs,
+                   method = "repeatedcv",
+                   repeats = 5,
+                   verbose = FALSE)
+
+lmProfile <- rfe(X, y,
+                 sizes = subsets,
+                 rfeControl = ctrl)
+
+lmProfile
+```
+
+# Model Selection
+
+Given that this problem is one of binary classification, the following types of models were considered: 
+
+* Logistic regression
+* Support vector machines
+* Decision tree
+* Random forest
+* AdaBoost
+
+## Model Training
+
+Each of the models considered is generated below using the`train()` function from the `caret` package. 
+
+```{r echo=TRUE}
+# Initialize cross validation control
+fitControl <- trainControl(method = "repeatedcv", number = 10)
+
+set.seed(764)
+
+# Train logistic regression model
+mdl_logistic <- train(y~., data=train.set, method="glm", family=binomial(), trControl=fitControl)
+
+# # Train linear SVM
+# mdl_svm_lin <- train(y~., data = train.set, method = "svmLinear", trControl=trctrl, tuneLength = 10)
+# 
+# # Train non-linear SVM - requires tuning hyperparameter C
+# mdl_svm_radial <- train(y~., data=train.set, method="svmRadial", trControl=fitControl)
+# 
+# # Train decision model
+# mdl_dt <- train(y~., data=train.set, method="ctree", trControl=fitControl)
+# 
+# # Train random forest
+# mdl_rf <- train(y~., data=train.set, method="cforest",  trControl=fitControl)
+# 
+# # Train AdaBoost
+# mdl_ada <- train(y~., data=train.set, method = "adaboost", trControl=fitControl)
+```
+
+## Feature Importance
+
+
+
+## Model Testing and Evaluation
+
+The trained models are tested against the training set below. Predicted values for the response variable are obtained, and then the accuracy of these predictions is stored using the `confusionMatrix()` function. 
+
+```{r echo=TRUE}
+# Generate predicted classifications on test set with each model
+logistic_pred <- predict(mdl_logistic,test.set)
+# svm_lin_pred <- predict(mdl_svm_lin,dtest)
+# svm_radial_pred <- predict(mdl_svm_radial,dtest)
+# dt_pred <- predict(mdl_dt,dtest)
+# rf_pred <- predict(mdl_rf,dtest)
+# ada_pred <- predict(mdl_ada,dtest)
+
+# Store the results
+cm_logistic <- confusionMatrix(logistic_pred, test.set$y)
+# cm_svm_lin_pred <-  confusionMatrix(svm_lin_pred,test.set$y)
+# cm_svm_radial_pred <-  confusionMatrix(svm_radial_pred,test.set$y)
+# cm_dt_pred <-  confusionMatrix(dt_pred,test.set$y)
+# cm_rf_pred <-  confusionMatrix(rf_pred,test.set$y)
+# cm_ada_pred <-  confusionMatrix(ada_pred,test.set$y)
+
+cm_logistic
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
