@@ -45,6 +45,10 @@
   val.x = val[ ,1:(ncol(train)-1)]
   val.y = val[ ,ncol(train)]
   
+  train.x <- as.matrix(train.x)
+  
+  model = glm(train.y~train.x[,1:2], family = binomial(logit))
+  
   # Set up containers for error estimates
   training = rep(0,2^4)
   validation = rep(0,2^4)
