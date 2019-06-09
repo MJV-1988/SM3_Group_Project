@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(gridExtra)
 library(caret)
-# library(MASS)
+library(MASS)
 library(kableExtra)
 library(broom)
 library(reshape2)
@@ -26,6 +26,7 @@ library(modelr)
 library(mlbench)
 library(Hmisc)
 library(randomForest)
+library(leaps)
 
 setwd("E:/Documents/GitHub/SM3_Group_Project")
 ```
@@ -382,16 +383,14 @@ ggplot(melt(cor), aes(x=Var1, y=Var2, fill=value))+geom_tile()+
   ggtitle("Correlation Between Numeric Predictors")+
   theme(plot.title = element_text(hjust = 0.5)) + xlab("") + ylab("")
 
-# # Get the correlation matrix for the correlated variables
-# cor.reduced <- round(cor(dat.num[,6:17]),2)
-# kable(cor.reduced) %>%
-#   kable_styling("striped", full_width = F) %>%
-#   row_spec(0, angle = -90)
+# Get the correlation matrix for the correlated variables
+cor.reduced <- round(cor(dat.num[,18:23]),2)
+kable(cor.reduced) %>%
+  kable_styling("striped", full_width = F) %>%
+  row_spec(0, angle = -90)
 ```
 
-`r kable(cor.reduced, digits = 2, caption = "Converted Variable Types", format = "latex", booktabs = T)`
-
-Looking at the correlations, we see that there is high correlation between each of the BILL_AMT_x variables, and also relatively high correlation between each PAY_x variable. However, outside of this, there is no strong correlation between predictor variables.
+Looking at the correlations, we see that there is high correlation between each of the BILL_AMT_x variables. As the `Pay` variables are not actually numerical, the correlations for these variables have been ignored. The precise correlations for the BILL_AMT_x variables have been included in a table.  
 
 
 \subsection{Model Fitting}
@@ -399,59 +398,55 @@ Looking at the correlations, we see that there is high correlation between each 
 
 Choosing an appropriate subset from the available predictor variables is an important step in selecting an accurate model. While the exclusion of important predictors will produce an incorrect model, adding too many redundant predictor terms can overcomplicate the model, making it harder to interpret without improving its accuracy. It can also reduce the statistical accuracy of parameter estimates. In machine learning, the process of selecting predictor variables for a model is know as *feature selection* ('feature' being a commonly used term for  predictor variables). 
 
-The other activity that makes up feature engineering is *Feature extraction*. This is the process of building new features out of the available predictor variables in the data set. Additional features that we considered were interaction terms, which are often appropriate when there is an observed relationship between features. We note from the previous section that there is a storng correlation between the `BILL_AMT` variables, as well as some correlation 
+The other activity that makes up feature engineering is *Feature extraction*. This is the process of building new features out of the available predictor variables in the data set. Additional features that we considered were interaction terms, which are often appropriate when there is an observed relationship between features. We note from the previous section that there is a strong correlation between the `BILL_AMT` variables. 
 
-We perform feature selection on the credit dataset using the Recursive Feature Elimination, which is a backwards selection technique that begins with all available features, and iteratively eliminates the least important ones. 
+We perform feature selection on the credit dataset using the Recursive Feature Elimination, which is a backwards selection technique that begins with all available features, and iteratively eliminates the least important ones. The model that was used to select features in this way was a random forest.  
 
-```{r eval=FALSE, include=FALSE}
-# Separate into training and test sets
+```{r echo=FALSE}
+# Convert necessary variables to factors
+dat$SEX = as.factor(dat$SEX)
+dat$EDUCATION = as.factor(dat$EDUCATION)
+dat$MARRIAGE = as.factor(dat$MARRIAGE)
+dat$PAY_0 = as.factor(dat$PAY_0)
+dat$PAY_2 = as.factor(dat$PAY_2)
+dat$PAY_3 = as.factor(dat$PAY_3)
+dat$PAY_4 = as.factor(dat$PAY_4)
+dat$PAY_5 = as.factor(dat$PAY_5)
+dat$PAY_6 = as.factor(dat$PAY_6)
 dat$y = as.factor(dat$y)
-set.seed(677)
+
+# Separate into training and test sets
+set.seed(55)
 trainIndex <- createDataPartition(dat$y, p = .7, list = FALSE, times = 1)
 train.set <- dat[trainIndex,]
 test.set <- dat[-trainIndex,]
 
-# Normalize the data first
-normalization <- preProcess(dat)
-# 
-# set.seed(10)
-# 
-# ctrl <- rfeControl(functions = cforest, method = "repeatedcv",
-#                    repeats = 5,
-#                    verbose = FALSE)
-# 
-# lmProfile <- rfe(x, y,
-#                  sizes = 1:13,
-#                  rfeControl = ctrl)
-# 
-# lmProfile
+# Set the cross validation control
+ctrl <- rfeControl(functions=rfFuncs, method="cv", number=5)
+
+# Get the optimal features for a random forest model
+# results <- rfe(train.set_X, train.set_y, sizes = c(1,2,3,4,5,6,10,15), rfeControl = ctrl)
+
+# Output the results
+# plot(results, type = c("g","o"), main = "Performance Accuracy vs Number of Features")
+# predictors(results)
 ```
 
-```{r eval=FALSE, include=FALSE}
-# ctrl <- rfeControl(functions=rfFuncs, method="cv", number=5)
-# 
-# train.set_X <- train.set[,1:23]
-# train.set_y <- train.set[,24]
-# 
-# 
+For the random forest model we examined using Recursive Feature Elimination, it was first found that the most accurate model consisted of *all* available predictor variables. However, the difference between this model and one with only five features was minor. We therefore performed this elimination algorithm again with a reduced number of possible predictors. 
+
+```{r echo=FALSE}
 # results_2 <- rfe(train.set_X, train.set_y, sizes = c(1,2,3,4,5,6), rfeControl = ctrl)
-# 
-# print(results_2)
+# plot(results_2, type = c("g","o"), main = "Performance Accuracy vs Number of Features")
 # predictors(results_2)
-# predictors(results)
-# plot(results_2, type = c("g","o"))
-# 
-# # Reduced model
-# train.set.reduced <- train.set
-# train.set.reduced %>% select(PAY_0, PAY_2, PAY_3, y)
-# 
-# mdl_svm_radial <- train(y~., data=train.set.reduced, method="svmRadial",
-# trControl=fitControl, preProcess=c("center", "scale"), tuneLength = 10)
 ```
+
+In this case, the model that included only 3 of the `PAY` features was considered the most accurate. Given that there was little variation in accuracy, in the interests of parimony we opted to attempt to train this reduced model. 
+
+Both the logisitic regression model and the single decision tree model were able to be trained in a reasonable timeframe. The optimal feature set for each of these models is considered in the following section. 
 
 # Model Selection
 
-Given that this problem is one of binary classification, the following types of models were considered: 
+Given that this problem is one of binary classification, the following types of models were considered, all of which are commonly applied to binary classification problems 
 
 * Logistic regression
 * Support vector machines
@@ -461,98 +456,108 @@ Given that this problem is one of binary classification, the following types of 
 
 ## Model Training
 
-Each of the models considered is generated below using the`train()` function from the `caret` package. 
+Each of the models considered is was trained using the`train()` function from the `caret` package. After attempting to train support vector machines, AdaBoost models and the random forest with the selected features above, none were found to be able to train in a reasonable timeframe, and so had to be abandoned. 
 
-```{r echo=FALSE}
-# reduced_train.set <- select(PAY_0, EDUCATION, MARRIAGE,PAY_AMT1)
-# reduced_test.set <- 
-# 
-# # Initialize cross validation control
-# fitControl <- trainControl(method = "repeatedcv", number = 5)
-# 
-# set.seed(489)
-# 
-# # Train logistic regression model
-# mdl_logistic <- train(y~., data=train.set, method="glm", family=binomial(), trControl=fitControl, preProcess=c("center", "scale"))
-# 
-# importance <- varImp(mdl_logistic, scale=FALSE)
-# 
-# # Train linear SVM
-# # mdl_svm_lin <- train(y~., data=train.set, method = "svmLinear", trControl=fitControl, preProcess=c("center", "scale"), tuneLength = 10)
-# 
-# # Train non-linear SVM - requires tuning hyperparameter C
-# # mdl_svm_radial <- train(y~., data=train.set, method="svmRadial",
-# # trControl=fitControl, preProcess=c("center", "scale"), tuneLength = 10)
-# 
-# # # Train decision model
-# mdl_dt <- train(y~., data=train.set, method="ctree", trControl=fitControl)
+Consequently, the two models that we trained initially were a logisitic regression model and a decision tree model, both with all features included.  
 
-# # # Train random forest
-# # mdl_rf <- train(y~., data=train.set, method="cforest",  trControl=fitControl)
-# # 
-# # # Train AdaBoost
-# # mdl_ada <- train(y~., data=train.set, method = "adaboost", trControl=fitControl)
+```{r echo=TRUE}
+set.seed(4)
 
-# importance
-# importance_dt <- varImp(mdl_dt, scale=FALSE)
-# 
-# # Train logistic regression model with subset of variables
-# mdl_logistic_reduced <- train(y~PAY_0+, data=train.set, method="glm", family=binomial(), trControl=fitControl, preProcess=c("center", "scale"))
-# 
-# importance
-# importance_dt
+# Set control for cross validation
+Fitctrl <- trainControl(method="cv", number=5)
+
+# Train logistic regression model using caret
+mdl_logistic <- train(y~., data=train.set, method="glm", family=binomial(), trControl=Fitctrl)
+
+# Train decision model
+mdl_dt <- train(y~., data=train.set, method="ctree", trControl=Fitctrl)
+
+# Get an initial reduced logistic model using stepwise AIC 
+mdl_logistic_full <- glm(y~., data=train.set, family = binomial(logit))
+# mdl_logistic_step_reduced <- stepAIC(mdl_logistic_full, direction = "both", trace = FALSE)
+
+# summary(mdl_logistic_step_reduced)
 ```
 
-## Feature Importance
+In the above R code, a logistic model was generated using `caret`, as well as using the standard R `glm()` function. As it proved difficult to use caret's functionality to automatically select optimal features using our preferred criterion, we instead used the stepwise AIC function. This nevertheless included some predictors which did not appear to be significant. From the reduced model, we decided to include the following features in our final logistic regression model. 
 
+* LIMIT_BAL
+* SEX
+* PAY_0
+* PAY_3
+* PAY_6
+* PAY_AMT1
+* PAY_AMT2
 
+We also built a decision tree model using only those predictors identified through the recursive feature elminiation exercise for random forest.  
+
+```{r}
+# Set up training set for the reduced decision tree model 
+train.set.logistic2 <- train.set[,c("LIMIT_BAL","SEX","PAY_0","PAY_3","PAY_6","PAY_AMT1","PAY_AMT2","y")]
+train.set.df <- train.set[,c("PAY_0", "PAY_2", "PAY_3", "y")]
+
+# Get the second reduced logistic regression model
+mdl_logistic_reduced2 <- glm(y~., data = train.set.logistic2, family = binomial(logit))
+
+# Get the reduced decision tree model
+mdl_dt_reduced <- train(y~., data=train.set.df, method="ctree", trControl=Fitctrl)
+```
 
 ## Model Testing and Evaluation
 
 The trained models are tested against the training set below. Predicted values for the response variable are obtained, and then the accuracy of these predictions is stored using the `confusionMatrix()` function. 
 
 ```{r echo=FALSE}
-# # Generate predicted classifications on test set with each model
-# pred_logistic <- predict(mdl_logistic,test.set)
-# # pred_svm_lin <- predict(mdl_svm_lin,test.set)
-# # pred_svm_radial <- predict(mdl_svm_radial,test.set)
-# pred_dt <- predict(mdl_dt,test.set)
-# # pred_rf <- predict(mdl_rf,test.set)
-# # pred_ada <- predict(mdl_ada,test.set)
-# 
-# # Store the results
-# cm_logistic <- confusionMatrix(pred_logistic, test.set$y)
-# # cm_svm_lin_pred <-  confusionMatrix(svm_lin_pred,test.set$y)
-# # cm_svm_radial_pred <-  confusionMatrix(svm_radial_pred,test.set$y)
-# cm_dt_pred <-  confusionMatrix(pred_dt,test.set$y)
-# # cm_rf_pred <-  confusionMatrix(rf_pred,test.set$y)
-# # cm_ada_pred <-  confusionMatrix(ada_pred,test.set$y)
-# 
-# # Extract the accuracy of each model
-# accuracy_logistic <- cm_logistic$overall[1]
-# # accuracy_svm_lin <- confusionMatrix(svm_lin_pred,test.set$y)
-# # accuracy_svm_radial <-confusionMatrix(svm_radial_pred,test.set$y)
-# accuracy_dt <- cm_dt_pred$overall[1]
-# # accuracy_rf <- confusionMatrix(rf_pred,test.set$y)
-# # accuracy_ada <- confusionMatrix(ada_pred,test.set$y)
+# Get the reduced test sets
+test.set.logistic <- test.set[,c("LIMIT_BAL","SEX","PAY_0","PAY_3","PAY_6","PAY_AMT1","PAY_AMT2","y")]
+test.set.logistic_step <- test.set[,c("LIMIT_BAL","SEX","EDUCATION","MARRIAGE","PAY_0","PAY_3","PAY_4","PAY_5","PAY_6","BILL_AMT2","PAY_AMT1","PAY_AMT2","y")]
+test.set.df <- test.set[,c("PAY_0", "PAY_2", "PAY_3", "y")]
 
-# # Placeholders
-# accuracy_svm_lin <- 0
-# accuracy_svm_radial <- 0
-# accuracy_rf <- 0
-# accuracy_ada <- 0
-# 
-# models_list <- c("Logistic Regression", "Linear SVM", "RBF Kernel SVM", "Decision Tree", "Random Forest", "AdaBoost")
-# accuracy_list <- c(round(accuracy_logistic*100,3), round(accuracy_svm_lin*100,3), round(accuracy_svm_radial*100,3), round(accuracy_dt*100,3), round(accuracy_rf*100,3), round(accuracy_ada*100,3))
-# 
-# accuracy_tbl <- data.frame(Model=models_list, Accuracy=accuracy_list) 
+# Generate predicted classifications on test set with each model
+pred_logistic <- predict(mdl_logistic,test.set)
+pred_dt <- predict(mdl_dt,test.set)
+pred_dt_reduced <- predict(mdl_dt_reduced,test.set.df)
+
+# Get the predicted classes for the stepwise reduced logit model
+# pred_logistic_step <- predict(mdl_logistic_step_reduced,test.set.logistic_step, type = "response")
+# predicted_classes_step <- ifelse(pred_logistic_step > 0.5, 1, 0)
+
+
+# Get the predicted classes for further reduced logit model
+pred_logistic_2 <- predict(mdl_logistic_reduced2,test.set.logistic, type = "response")
+predicted_classes <- ifelse(pred_logistic_2 > 0.5, 1, 0)
+
+# Store the results
+cm_logistic <- confusionMatrix(pred_logistic, test.set$y)
+cm_dt_pred <-  confusionMatrix(pred_dt,test.set$y)
+cm_dt_pred_reduced <-  confusionMatrix(pred_dt_reduced,test.set.df$y)
+
+# Extract the accuracy of each model
+accuracy_logistic <- cm_logistic$overall[1]
+# accuracy_logistic_step <- mean(predicted_classes == test.set.logistic_step$y)
+accuracy_logistic_step <- 0 # Placeholder
+accuracy_logistic_2 <- mean(predicted_classes == test.set.logistic$y)
+accuracy_dt <- cm_dt_pred$overall[1]
+accuracy_dt_reduced <- cm_dt_pred_reduced$overall[1]
+
+# Output the accuracy results in table
+models_list <- c("Logistic Regression", "Reduced Logistic Regression 1", "Reduced Logistic Regression 2", "Decision Tree", "Reduced Decision Tree")
+accuracy_list <- c(round(accuracy_logistic*100,3), round(accuracy_logistic_step*100,3), round(accuracy_logistic_2*100,3), round(accuracy_dt*100,3), round(accuracy_dt_reduced*100,3))
+accuracy_tbl <- data.frame(Model=models_list, Accuracy=accuracy_list)
+# accuracy_tbl
 ```
 
-<!-- r kable(accuracy_tbl, digits = 2, caption = "Test Accuracy of Trained Models", format = "latex", booktabs = T) -->
-
-
+`r kable(accuracy_tbl, digits = 2, caption = "Test Accuracy of Trained Models", format = "latex", booktabs = T)`
 
 \subsection{Final Model}
+
+\section{Assumption Checking}
+
+```{r echo=FALSE}
+# Output the diagnostic plots for the regression model
+plot(mdl_logistic_full)
+```
+
 
 
 
@@ -561,5 +566,4 @@ The trained models are tested against the training set below. Predicted values f
 
 
 # Reference
-
 
