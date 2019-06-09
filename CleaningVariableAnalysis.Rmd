@@ -5,7 +5,8 @@ header-includes:
   - \usepackage{longtable}
   - \usepackage{array}
 output:
-  pdf_document: default
+  pdf_document: 
+    number_sections: true
   html_document: default
 ---
 
@@ -16,9 +17,55 @@ library(gridExtra)  # arrange plots
 library(MASS)       # extract residuals, do boxcox etc.
 ```
 
+\section{Introduction}
+<!-- For banks, risk management and default detection has always been a crucial part in issuing credit cards. Though the law has stringent measures against credit card defaulting, it is still prevalent in most parts. Predicting the nature of a customer of whether he might be a defaulter or not is a complex function. Statistic models can play the role of assistive banker in ensuring default less credits and safe banking. In order to reduce or even prevent loss of this kind, banks need to determine appropriate given credit for each special client based on their information.  -->
+							
+A crucial part of issuing credit cards is risk management and default detection within a bank. Though the law has stringent measures against credit card defaulting, it is still prevalent in many cases. It is often difficult to determine whether a given individual is at risk of defaulting given a data set, due to the highly complicated nature of the problem. Statistical models may assist in predicting if a person is likely to default given their history and other factors, to assist banks in minimising potential losses.					
+							
+							
+								
+<!-- Predictive modelling is the process of applying statistical technique to derive a model between response variables and predictors and approach to the best. In this project, the data taken from the file train and we are provided 20,000 credit card customers consists of a single binary response, indicating default in the October 2005 payments and 23 predictor variables. We are going to demonstrate the process of deriving the best fit predictive model, which represents the relationship between default of credit card payment and some significant features. The task is to produce a function takes a n × 23 matrix of predictor variables as its input and produces a n-dimensional vector of predictions with 0 for no default and 1 for default as its output. -->
+
+Predictive modelling is the process of applying statistical techniques, such as regression, to derive a model between a set of predictor variables, such as the financial history of an individual, and a response variable, such as whether or not they are at risk of defaulting. This is usually done by analysing a data set where the response is known for the predictor variables, to build a model that can then be applied to data where the response is unknown. In this project, the data set for training the model consists of 20,000 individuals, with their financial history, demographics and their defaulting status.
+
+<!-- At the very first parts of this paper, we will present missing data handling and denoting, defective data cleaning, making sure variables are appropriately categorised into quantitative (continuous or discrete) or categorical. Histogram and bar-chart will be plotted to illustrate their distribution respectively. As the prior process of selecting model, bivariate analysis will be included continuous and categorical variables and conducted by producing box-plot and scatter-plot to examine the effect of predictors on defaulting, and the relationship will be stated clearly. The cross validation method also used to select the final model. The following section is the most significant where we derive the final model by comparing the best model that derivate by algorithms involve backwards, forwards, stepwise and automatic. And in our last sections, statistic summary and figures will be illustrated to support the assumptions checking of our final model. As verification of our model selection, a prediction will be made on the default of a customer by using the final model and some new data. -->
+
+To produce a model, first the data was split into two sets in Section \ref{secDataPrep}, with 15,000 observations being used as a training set, and the remaining 5,000 retained as a validation set. Sections \ref{secUniVar} and \ref{secBiVar} desribe the distributins of each variable in the data set, as well as any interactions present between each of the variables. This allows for a more accurate set of potential models to be produced in Section \ref{secModelBuilding}, using the training data. The validation data is then used to evaluate the error of each model in Section \ref{secError}, with the best model and its error presented in Section \ref{secFinalModel}. The assumptions of the chosen model will be shown and discussed in Section \ref{secAssumptions} \textbf{is there actually a prediction that needs to be made?}.
+
+
+
+
 \section{Cleaning and Preparing the Data}
+\label{secDataPrep}
+The following R code was used to read in the data set from \texttt{train.csv}.
 ```{r}
 dat = read.csv("train.csv", skip = 1)
+```
+By inspecting the data, and using the \texttt{is.na} command on each variable, it was determined that there were no missing values in the data, so cleaning was not required. Next, each variable was inspected to ensure it is of the correct type:
+```{r,include=TRUE}
+str(dat)
+```
+As shown, all variables are considered integers. This is not correct, as the only numeric variables are \texttt{LIMIT\_BAL}, \texttt{AGE}, \texttt{BILL\_AMT} and \texttt{PAY\_AMT}. The other variables were converted to factors using the following R code:
+
+```{r}
+dat2 = dat
+dat2$SEX = as.factor(dat$SEX)
+dat2$EDUCATION = as.factor(dat$EDUCATION)
+dat2$MARRIAGE = as.factor(dat$MARRIAGE)
+dat2$PAY_0 = as.factor(dat$PAY_0)
+dat2$PAY_2 = as.factor(dat$PAY_2)
+dat2$PAY_3 = as.factor(dat$PAY_3)
+dat2$PAY_4 = as.factor(dat$PAY_4)
+dat2$PAY_5 = as.factor(dat$PAY_5)
+dat2$PAY_6 = as.factor(dat$PAY_6)
+dat2$default.payment.next.month = as.factor(dat$default.payment.next.month)
+```
+The data set now comprises of 14 numeric variables and 10 factors, as expected:
+```{r,include = TRUE}
+str(dat2)
+```
+The data was then split into the predictor variables and response variable, as well as the training set and validation set.
+```{r}
 validInd = sample(1:nrow(dat), nrow(dat)/4) 
 train = dat[-validInd, ]
 valid = dat[validInd, ]
@@ -27,10 +74,8 @@ trainY = train[ ,ncol(dat)]
 validX = valid[ ,1:(ncol(dat)-1)]
 validY = valid[ ,ncol(dat)]
 ```
-
-
 \section{Univariate Analysis}
-
+\label{UniVar}
 
 \subsection{Variable Descriptions}
 \begin{table}[h!]
@@ -77,12 +122,12 @@ p3 <- ggplot(dat, aes(x = SEX)) +
 p4 <- ggplot(dat, aes(x = EDUCATION)) +
   geom_histogram(bins = 4, col = "black") +
   ggtitle("Histogram of Education") +
-  xlab("Education of an individual")
+  xlab("Education of an individual; 1 = graduate school, 2 = university, \n 3 = high school, 4 = other")
 
 p5 <- ggplot(dat, aes(x = MARRIAGE)) +
   geom_histogram(bins = 4, col = "black") +
   ggtitle("Histogram of Marriage") +
-  xlab("Martial status of an individual; 0 = ???, 1 = married, \n 2 = single, 3 = high school, 4 = other")
+  xlab("Martial status of an individual; 0 = ???, 1 = married, \n 2 = single, 3 = other")
 
 p6 <- ggplot(dat, aes(x = AGE)) +
   geom_histogram(binwidth = 1, col = "black") +
