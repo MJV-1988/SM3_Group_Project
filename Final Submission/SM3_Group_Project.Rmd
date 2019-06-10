@@ -4,7 +4,7 @@ header-includes:
   - \usepackage{float}
   - \usepackage{longtable}
   - \usepackage{array}
-author: "1148120 - Matthew Vincent "
+author: "1148120 - M. Vincent,  "
 output:
   pdf_document: default
   html_document: default
@@ -28,7 +28,11 @@ library(Hmisc)
 library(randomForest)
 library(leaps)
 
-setwd("E:/Documents/GitHub/SM3_Group_Project")
+# Set working directory
+setwd("E:/Documents/GitHub/SM3_Group_Project/Final Submission")
+
+# Suppress warnings
+options(warn=-1)
 ```
 
 ```{r include=FALSE}
@@ -161,7 +165,7 @@ grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
 
 In order to determine the nature and strength of the relationship between each predictor variable and the response variable, default payment next month, plots of each of these relationships will be produced and investigated. Determing the relative associations of these predictor variables is important, as it allows us to consider the implication of their inclusion in the final model.
 
-## 3.1. Continous Variables}
+## 3.1. Continous Variables
 We will begin by considering the relationship of the continuous predictor variables against default payment next month. These relationships will be analysed using side-by-side box plots.
 
 ### 3.1.1. Limiting Balance against default payment next month
@@ -203,15 +207,10 @@ Upon further inspection, the median values and the lower quartile values are the
 PAY_X is a measure of an individual's payment history, with:
 
 1. PAY_6 corresponding to the individuals payment in April.
-
 2. PAY_5 corresponding to the individuals payment in May.
-
 3. PAY_4 corresponding to the individuals payment in June.
-
 4. PAY_3 corresponding to the individuals payment in July.
-
 5. PAY_2 corresponding to the individuals payment in August.
-
 6. PAY_0 corresponding to the individuals payment in September.
 
 Each PAY_X is an integer variable, taking values between -2 and 8 (corresponding to month's the payment of that month was overdue). Hence, the relationship between Pay_X and default payment next month will be investigated using side-by-side boxplots.
@@ -240,15 +239,10 @@ Observing these plots, we see that they are all positively skewed, with relative
 BILL_AMTX is the amount appearing on the bill statement as follows:
 
 1. BILL_AMT6 corresponding to the individuals statement in April.
-
 2. BILL_AMT5 corresponding to the individuals statement in May.
-
 3. BILL_AMT4 corresponding to the individuals statement in June.
-
 4. BILL_AMT3 corresponding to the individuals statement in July.
-
 5. BILL_AMT2 corresponding to the individuals statement in August.
-
 6. BILL_AMT1 corresponding to the individuals statement in September.
 
 As BILL_AMTX is a numeric variable, we will investigate its relationship with default payment next month using side-by-side boxplots.
@@ -408,28 +402,31 @@ trainIndex <- createDataPartition(dat$y, p = .7, list = FALSE, times = 1)
 train.set <- dat[trainIndex,]
 test.set <- dat[-trainIndex,]
 
+# Get the 
+train.set_X <- train.set[,1:23]
+train.set_y <- train.set[,24]
+
 # Set the cross validation control
 ctrl <- rfeControl(functions=rfFuncs, method="cv", number=10)
 
 # Get the optimal features for a random forest model
-results <- rfe(train.set_X, train.set_y, sizes = c(1,2,3,4,5,6,10,15), rfeControl = ctrl)
+# results <- rfe(train.set_X, train.set_y, sizes = c(1,2,3,4,5,6,10,15), rfeControl = ctrl)
 
 # Output the results
-plot(results, type = c("g","o"), main = "Performance Accuracy vs Number of Features")
-predictors(results)
+# plot(results, type = c("g","o"), main = "Performance Accuracy vs Number of Features")
+# predictors(results)
+```
+![Accuracy against number of features for random forest model](rfe1.png)
+
+For the random forest model we examined using Recursive Feature Elimination, it was first found that the most accurate model consisted of just three features, as shown in Figure 1. `PAY_0`, `PAY_2` and `PAY_3`. It was decided that a random forest model including just these three predictors would be trained. 
+
+```{r eval=FALSE, include=FALSE}
+# results_2 <- rfe(train.set_X, train.set_y, sizes = c(1,2,3,4,5,6), rfeControl = ctrl)
+# plot(results_2, type = c("g","o"), main = "Performance Accuracy vs Number of Features")
+# predictors(results_2)
 ```
 
-For the random forest model we examined using Recursive Feature Elimination, it was first found that the most accurate model consisted of *all* available predictor variables. However, the difference between this model and one with only five features was minor. We therefore performed this elimination algorithm again with a reduced number of possible predictors. 
-
-```{r echo=FALSE}
-results_2 <- rfe(train.set_X, train.set_y, sizes = c(1,2,3,4,5,6), rfeControl = ctrl)
-plot(results_2, type = c("g","o"), main = "Performance Accuracy vs Number of Features")
-predictors(results_2)
-```
-
-In this case, the model that included only 3 of the `PAY` features was considered the most accurate. Given that there was little variation in accuracy, in the interests of parimony we opted to attempt to train this reduced model. 
-
-Both the logisitic regression model and the single decision tree model were able to be trained in a reasonable timeframe. The optimal feature set for each of these models is considered in the following section. 
+Unlike the random forest model, both the logistic regression model and the single decision tree model were able to be trained in a reasonable timeframe with all features included. The optimal feature set for each of these models was therefore examined at the model training and evaulation stage. 
 
 ## 4.2. Model Selection
 
@@ -529,7 +526,8 @@ accuracy_tbl <- data.frame(Model=models_list, Accuracy=accuracy_list)
 
 # 5. Final Model
 
-Having attempted several different approaches, we found that only two could be trained in a practical timeframe. These were logistic regression and a single decision tree. Our preliminary feature selection work was not directly applicable to our final model selection decisions, given that it proved too resource-intensive to train even a reduced random forest model on the data set. However, given the random forests are an aggregation of decision trees, we chose to try training a decision tree with only the three features that were identified as important for the random forest. 
+Having attempted several different approaches, we found that only two could be trained in a practical timeframe. These were logistic regression and a single decision tree. Our preliminary feature selection work was not directly applicable to our final model selection decisions, given that it proved too resource-intensive to train even a reduced random forest model on the data set. However, given the random forests are an aggregation of decision trees, we chose to try training a decision tree with only the three features that were identified as important for the random forest.
+
 To obtain a more parsimonious logistic regression model, we applied stepwise selection using the Akaike Information Criterion to determine feature significance. The features that were identified through this process were then extracted, and a new model was trained, using cross validation, on the reduced feature set. 
 
 In total, we trained four different models; two decision trees and two logistic regression models. We trained these models several times as they were each being developed, and typically found little variability in terms of their classification accuracy. However, the logisitic regression models performed slightly better than the decision tree models, and reduced logistic model showed very similar or slightly better perfomance than the full model. In the interests of model simplicity, we have opted to use the reduced logistic regression model to make our predictions. 
@@ -539,12 +537,6 @@ In total, we trained four different models; two decision trees and two logistic 
 saveRDS(mdl_logistic.2, "./final_model.rds")
 ```
 
-# 6. Assumption Checking
-
-```{r echo=FALSE}
-# Output the diagnostic plots for the regression model
-plot(mdl_logistic_full)
-```
 
 
 
