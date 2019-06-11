@@ -56,9 +56,9 @@ names(dat)[ncol(dat)]<-"y"
 
 Managing the risk of default has always been a crucial aspect business for banks and other institutions offering credit card loans. Although in most jurisdictions there are legal consequences discouraging credit card default, it is still a critical issue that lenders have to contend with. Predicting whether or not a given borrower is likely to default on their credit card debt is complex problem. Statistical models can play an important role in minimising the risk of default. Lenders can use information about previous customers, including whether or not they have defaulted on their loans, to assess the likelihood that a potential new customer will default, given the known characteristics of that that individual.
 
-Predictive modelling is the process of applying statistical techniques to reveal the relationship between a response variable and one or more predictor variables, inclulding whether a relationship exists at all, in order to make predictions given new data. There are a great number statistical techniques that can be used for this purpose, however most of these techniques will fall into one of two categories; regression or classification. In regression models, the response is a continuous variable. In classification models, the response is a categorical variable. When the response can only take two possible values, the problem is one of *binary classification*. Predicting whether or not a customer will default on their credit card loans is an example of a binary classification problem. In this project, we use a dataset consisting of 20,000 individuals, with their financial history, demographics and whether or not they have defaulted, and use this data to train a model to predict whether a new customer is likely to default on a loan. 
+Predictive modelling is the process of applying statistical techniques to reveal the relationship between a response variable and one or more predictor variables, including whether a relationship exists at all, in order to make predictions given new data. There are a great number statistical techniques that can be used for this purpose, however most of these techniques will fall into one of two categories; regression or classification. In regression models, the response is a continuous variable. In classification models, the response is a categorical variable. When the response can only take two possible values, the problem is one of *binary classification*. Predicting whether or not a customer will default on their credit card loans is an example of a binary classification problem. In this project, we use a dataset consisting of 20,000 individuals, with their financial history, demographics and whether or not they have defaulted, and use this data to train a model to predict whether a new customer is likely to default on a loan. 
 
-To generate the model, we used `caret`, a machine learning package for R. Functions from the `caret` package were used to help determine which predictors should be used in the model, and then to train and evaluate potential models. Before we began training models, we first performed exploratory data analysis. Sections \ref{secUniVar} and \ref{secBiVar} descibe the distributions of each variable in the data set, as well as relationships between predictor variables. This preliminary analysis allowed for a more efficient model selection process. This process is described in section .... The performance of several models that we considered is included in this section, along with the final model that was selected. 
+To generate the model, we used `caret`, a machine learning package for R. Functions from the `caret` package were used to help determine which predictors should be used in the model, and then to train and evaluate potential models. Before we began training models, we first performed exploratory data analysis. Sections 2 and 3 describe the distributions of each variable in the data set, as well as relationships between predictor variables. This preliminary analysis allowed for a more efficient model selection process. The model selection process is described in section 4. The performance of several models that we considered is included in this section, along with the final model that was selected. We describe the final model in section 5, along with instructions for generating the predicted classes for a new dataset using our model. 
 
 # 1. Cleaning and Preparing the Data
 
@@ -163,9 +163,9 @@ grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
 \newpage
 # 3. Bivariate Analysis
 
-In order to determine the nature and strength of the relationship between each predictor variable and the response variable, default payment next month, plots of each of these relationships will be produced and investigated. Determing the relative associations of these predictor variables is important, as it allows us to consider the implication of their inclusion in the final model.
+In order to determine the nature and strength of the relationship between each predictor variable and the response variable, default payment next month, plots of each of these relationships will be produced and investigated. Determining the relative associations of these predictor variables is important, as it allows us to consider the implication of their inclusion in the final model.
 
-## 3.1. Continous Variables
+## 3.1. Continuous Variables
 We will begin by considering the relationship of the continuous predictor variables against default payment next month. These relationships will be analysed using side-by-side box plots.
 
 ### 3.1.1. Limiting Balance against default payment next month
@@ -184,7 +184,7 @@ print(median(dat$LIMIT_BAL[dat$y==0]))
 print(median(dat$LIMIT_BAL[dat$y==1]))
 ```
 
-The median limiting balance for those who do not default next month's payment is 150000, and 90000 for those who do default next month's payment. Thus it could be suggested that having a larger limiting balance amount may decrease the likelihood of defaulting next month's payment, however there is not sufficiently strong evidence to definitively conlude this. It should also be noted that both levels have potential outlier candidates.
+The median limiting balance for those who do not default next month's payment is 150000, and 90000 for those who do default next month's payment. Thus it could be suggested that having a larger limiting balance amount may decrease the likelihood of defaulting next month's payment, however there is not sufficiently strong evidence to definitively conclude this. It should also be noted that both levels have potential outlier candidates.
 
 ### 3.1.2. Age against default payment next month
 
@@ -264,7 +264,7 @@ p6 <- ggplot(aes(x=as.factor(y), y=BILL_AMT6, group=y),data=dat) + geom_boxplot(
 grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
 ```
 
-We see that all of these plots are positively skewed. Additionally, all side-by-side boxplots show that the median values for both levels of default payment next month lie withtin very close proximity of each other. Furthermore, there is also close similarities with the interquartile spread in each plot.
+We see that all of these plots are positively skewed. Additionally, all side-by-side boxplots show that the median values for both levels of default payment next month lie within very close proximity of each other. Furthermore, there is also close similarities with the interquartile spread in each plot.
 
 ```{r BILL_AMTX medians}
 print(Med_Def0 <- c(median(dat$BILL_AMT1[dat$y==0]), median(dat$BILL_AMT2[dat$y==0]), median(dat$BILL_AMT3[dat$y==0]), median(dat$BILL_AMT4[dat$y==0]), median(dat$BILL_AMT5[dat$y==0]), median(dat$BILL_AMT6[dat$y==0])))
@@ -316,7 +316,7 @@ print(Median_Def1 <- c(median(dat$PAY_AMT1[dat$y==1]), median(dat$PAY_AMT2[dat$y
 Upon further inspection, the median values are marginally larger for those who do not default next month's payment, so there may be a very small influence. There are outlier candidates for both levels of default payment next month.
 
 ## 3.2. Categorical Variables
-We now consider the relationship between the categorical predictor variables and the response variable. These will be explored using side-by-side box plots where appropriate, otherwise analysing the mean values.
+We now consider the relationship between the categorical predictor variables and the response variable. These will be explored using side-by-side box plots where appropriate, otherwise analyzing the mean values.
 
 ## 3.2.1. Sex against default payment next month
 
@@ -357,7 +357,7 @@ The mean marriage value for those who do not default next month's payment is 1.5
 In order to determine the strength of the relationships between predictors, we look at the correlation between the numeric predictor variables. This is shown in the graphic below.
 
 
-```{r correlation, echo=FALSE}
+```{r correlation, echo=FALSE, fig.height=4, fig.width=5}
 # Convert necessary variables to factors
 dat$SEX = as.factor(dat$SEX)
 dat$EDUCATION = as.factor(dat$EDUCATION)
@@ -380,14 +380,13 @@ ggplot(melt(cor), aes(x=Var1, y=Var2, fill=value))+geom_tile()+
 # Get the correlation matrix for the correlated variables
 cor.reduced <- round(cor(dat.num[,3:8]),2)
 kable(cor.reduced) %>%
-  kable_styling("striped", full_width = F) %>%
-  row_spec(0, angle = -90)
+  kable_styling("striped", full_width = F)
 ```
 
 Looking at the correlations, we see that there is high correlation between each of the BILL_AMT_x variables. The precise correlations for the BILL_AMT_x variables have been included in a table.  
 
 # 4. Model Fitting
-## 4.1. Feature Eingeering
+## 4.1. Feature Engineering
 
 Choosing an appropriate subset from the available predictor variables is an important step in selecting an accurate model. While the exclusion of important predictors will produce an incorrect model, adding too many redundant predictor terms can overcomplicate the model, making it harder to interpret without improving its accuracy. It can also reduce the statistical accuracy of parameter estimates. In machine learning, the process of selecting predictor variables for a model is know as *feature selection* ('feature' being a commonly used term for  predictor variables). 
 
@@ -426,7 +425,7 @@ For the random forest model we examined using Recursive Feature Elimination, it 
 # predictors(results_2)
 ```
 
-Unlike the random forest model, both the logistic regression model and the single decision tree model were able to be trained in a reasonable timeframe with all features included. The optimal feature set for each of these models was therefore examined at the model training and evaulation stage. 
+Unlike the random forest model, both the logistic regression model and the single decision tree model were able to be trained in a reasonable timeframe with all features included. The optimal feature set for each of these models was therefore examined at the model training and evaluation stage. 
 
 ## 4.2. Model Selection
 
@@ -441,7 +440,7 @@ Given that this problem is one of binary classification, the following types of 
 
 Each of the models considered was trained using the`train()` function from the `caret` package. After attempting to train support vector machines, an AdaBoost model, and the reduced random forest with the selected features above, none were found to be able to train in a reasonable timeframe, and so had to be abandoned. 
 
-Consequently, the two models that we trained initially were a logisitic regression model and a decision tree model, both with all features included.
+Consequently, the two models that we trained initially were a logistic regression model and a decision tree model, both with all features included.
 
 ```{r echo=FALSE}
 set.seed(68)
@@ -473,7 +472,7 @@ accuracy_list <- c(round(accuracy_logistic.1*100,3), round(accuracy_dt.1*100,3))
 accuracy_tbl.1 <- data.frame(Model=models_list, Accuracy=accuracy_list)
 ```
 
-`r kable(accuracy_tbl.1, digits = 2, caption = "Test Accuracy of Trained Models", format = "latex", booktabs = T)`
+r kable(accuracy_tbl.1, digits = 2, caption = "Test Accuracy of Trained Models", format = "latex", booktabs = T)
 
 In the above R code, a logistic model was generated using `caret`, as well as using the standard R `glm()` function. As it proved difficult to use caret's functionality to automatically select optimal features using our preferred criterion, we instead used the stepwise AIC function. None of the features identified in this model exhibited a meaningful correlation, and so we did not include interactiion terms between any of the features. 
 
@@ -522,22 +521,28 @@ accuracy_list <- c(round(accuracy_logistic.1*100,3), round(accuracy_logistic.2*1
 accuracy_tbl <- data.frame(Model=models_list, Accuracy=accuracy_list)
 ```
 
-`r kable(accuracy_tbl, digits = 2, caption = "Test Accuracy of All Trained Models", format = "latex", booktabs = T)`
+r kable(accuracy_tbl, digits = 2, caption = "Test Accuracy of All Trained Models", format = "latex", booktabs = T)
 
 # 5. Final Model
+
+## 5.1. 
 
 Having attempted several different approaches, we found that only two could be trained in a practical timeframe. These were logistic regression and a single decision tree. Our preliminary feature selection work was not directly applicable to our final model selection decisions, given that it proved too resource-intensive to train even a reduced random forest model on the data set. However, given the random forests are an aggregation of decision trees, we chose to try training a decision tree with only the three features that were identified as important for the random forest.
 
 To obtain a more parsimonious logistic regression model, we applied stepwise selection using the Akaike Information Criterion to determine feature significance. The features that were identified through this process were then extracted, and a new model was trained, using cross validation, on the reduced feature set. 
 
-In total, we trained four different models; two decision trees and two logistic regression models. We trained these models several times as they were each being developed, and typically found little variability in terms of their classification accuracy. However, the logisitic regression models performed slightly better than the decision tree models, and reduced logistic model showed very similar or slightly better perfomance than the full model. In the interests of model simplicity, we have opted to use the reduced logistic regression model to make our predictions. 
+In total, we trained four different models; two decision trees and two logistic regression models. We trained these models several times as they were each being developed, and typically found little variability in terms of their classification accuracy. However, the logisitic regression models performed slightly better than the decision tree models, and reduced logistic model showed very similar or slightly better performance than the full model. In the interests of model simplicity, we have opted to use the reduced logistic regression model to make our predictions. 
 
-```{r}
+```{r include=FALSE}
 # Save the final model
 saveRDS(mdl_logistic.2, "./final_model.rds")
 ```
 
+## 5.2. Generating Predictions
 
+We have include a function to read in a dataset and generate predictions using our selected model. This function is contained in the file `default_prediction.R`. This function takes a single csv file as an argument,which is required to be of the same format as the training dataset file. As with the training dataset, the function reads in the column headers first, then the body of the dataset into a dataframe. The column headers are then assigned to the dataframe. Next, the ID column in removed, and all features that should be stored has factors are converted from numeric. 
+
+The model itself has been stored as a separate file, `final_model.rds`, which is then read into the function to generate predictions. The predicted classes are then generated, and returned. 
 
 
 

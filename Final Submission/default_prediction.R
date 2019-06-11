@@ -1,6 +1,9 @@
 
 ##########     CREDIT CARD DEFAULT PREDICTION      ###########
 
+library(tidyverse)
+library(caret)
+
 # Function to read in dataset and make predictions for 
 # whether a borrower is going to default in the next month 
 default_prediction = function(file) {
@@ -9,16 +12,13 @@ default_prediction = function(file) {
   headers <- read.csv(file, skip=1, header=F, nrows=1, as.is=T)
   
   # Read in complete dataset
-  dat <- read.csv(file = "train.csv", skip = 2, header = F)
+  dat <- read.csv(file, skip = 2, header = F)
   
   # Add the headers to dataset
   colnames(dat) <- headers
   
   # Remove the ID field
   dat <- dat[ ,-1]
-  
-  # Rename response variable for brevity
-  names(dat)[ncol(dat)]<-"y"
   
   # Convert the necessary columns to factors
   dat$SEX = as.factor(dat$SEX)
@@ -30,7 +30,6 @@ default_prediction = function(file) {
   dat$PAY_4 = as.factor(dat$PAY_4)
   dat$PAY_5 = as.factor(dat$PAY_5)
   dat$PAY_6 = as.factor(dat$PAY_6)
-  dat$y = as.factor(dat$y)
   
   # Read in the final model
   mdl_final <- readRDS("./final_model.rds")
